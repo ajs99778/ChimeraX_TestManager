@@ -1,0 +1,8 @@
+ChimAARON*
+build
+*.pxd
+*.pyc
+*.egg*
+AaronTools*
+setup.py
+cy_selectors.pyx

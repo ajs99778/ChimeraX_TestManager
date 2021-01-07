@@ -1,4 +1,4 @@
-#TestManager
+# TestManager
 Manager for test cases (à la `unittest`) for ChimeraX bundles.
 Creating test cases can allow bundle developers to quickly test the functionality of their bundle and whether their bundle remains functioning after code is edited or ChimeraX updates.
 Test cases can be created by subclassing the `TestWithSession` class of this bundle. 

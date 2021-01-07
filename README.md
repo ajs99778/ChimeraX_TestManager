@@ -28,7 +28,8 @@ class AngleCmdTest(TestWithSession):
         # therefore, our water molecule should be the first and only open model
         mdl = self.session.models.list()[0]
         
-        # open a reference structure, which has an H-O-H angle of 104.5 and the same bonding pattern as the previous water molecule
+        # open a reference structure, which has an H-O-H angle of 104.5 and
+        # the same bonding pattern as the previous water molecule
         run(self.session, "open /home/CoolUser/my_bundle/tests/structures/water_angle_ref.mol2")
         # grab this reference structure
         ref_mdl = self.session.models.list()[1]

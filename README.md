@@ -69,3 +69,5 @@ The "Run Tests" tool, found in the "Utilities" section, can also be used to run 
 The tool lists all providers, and the providers can be selected to only run test methods of those providers.
 After tests are run, results can be viewed in the tool.
 For both the `test` command the the tool, results are printed to the log.
+
+The test manager currently works with ChimeraX 1.1 and the ChimeraX 1.2 daily build as of 6th January, 2021.

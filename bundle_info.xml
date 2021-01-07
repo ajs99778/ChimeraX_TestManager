@@ -8,7 +8,7 @@
             
             <Author>Tony Schaefer</Author>
             <Email>tony.schaefer@uga.edu</Email>
-            <URL>http://qchasm.wheelergroupresearch.com/</URL>
+            <URL>https://github.com/ajs99778/ChimeraX_TestManager</URL>
             <License>license.txt</License>
             <Synopsis>manager for test cases</Synopsis>
             <Description>Manager for test cases (à la `unittest`) for ChimeraX bundles.

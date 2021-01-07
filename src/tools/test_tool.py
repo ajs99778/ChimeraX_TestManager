@@ -134,7 +134,7 @@ class TestRunner(ToolInstance):
     
     def run_tests(self):
         """run the tests selected on the table and show the results"""
-        from TESTROW.commands.test import test
+        from TestManager.commands.test import test
         
         test_list = []
         

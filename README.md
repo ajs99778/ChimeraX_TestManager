@@ -17,7 +17,7 @@ class AngleCmdTest(TestWithSession):
     """tests associated with the `angle` command"""
     
     def test_change_angle(self):
-        """test setting the angle of a simple structure"
+        """test setting the angle of a simple structure"""
         # open a water molecule
         run(self.session, "open /home/CoolUser/my_bundle/tests/structures/water_molecule.mol2")
         # set the H-O-H angle to 104.5 degrees

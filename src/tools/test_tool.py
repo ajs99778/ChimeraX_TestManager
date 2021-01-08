@@ -165,6 +165,7 @@ class TestRunner(ToolInstance):
         for name in results:
             widget = QWidget()
             widget_layout = QHBoxLayout(widget)
+            widget_layout.setContentsMargins(0, 0, 0, 0)
             
             success_button = get_button("success")
             fail_button = get_button("fail")
@@ -225,8 +226,8 @@ class TestRunner(ToolInstance):
                 success_button.setText("%i" % success_count)
                 success_button.setToolTip(success_tooltip)
                 success_button.clicked.connect(
-                    lambda *args, res=success_tooltip: self.tool_window.create_child_window(
-                        "successes for %s" % name,
+                    lambda *args, t_name=name, res=success_tooltip: self.tool_window.create_child_window(
+                        "successes for %s" % t_name,
                         text=res,
                         window_class=ResultsWindow,
                     )
@@ -316,9 +317,9 @@ class TestRunner(ToolInstance):
                     continue
                 
                 self.table.setCellWidget(i, 1, cell_widgets[widget_count])
-                self.table.resizeRowToContents(i)
+                # self.table.resizeRowToContents(i)
                 widget_count += 1
-                
+
 
 class ResultsWindow(ChildToolWindow):
     def __init__(self, tool_instance, title, text="", **kwargs):
@@ -327,7 +328,7 @@ class ResultsWindow(ChildToolWindow):
         self._build_ui()
         
         self.results.setText(text)
-        
+
     def _build_ui(self):
         layout = QVBoxLayout()
         

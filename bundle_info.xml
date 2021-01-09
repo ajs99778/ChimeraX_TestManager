@@ -4,7 +4,7 @@
             maxSessionVersion="3"
             package="TestManager"
             purePython="true"
-            version="0.1">
+            version="0.1.1">
             
             <Author>Tony Schaefer</Author>
             <Email>tony.schaefer@uga.edu</Email>

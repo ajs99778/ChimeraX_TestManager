@@ -24,7 +24,7 @@ class AngleCmdTest(TestWithSession):
         run(self.session, "angle @H1 @O1 @H2 104.5")
         
         # grab the water model
-        # before and after every test, all open models are closed
+        # by default, before and after every test, all open models are closed
         # therefore, our water molecule should be the first and only open model
         mdl = self.session.models.list()[0]
         
@@ -38,6 +38,16 @@ class AngleCmdTest(TestWithSession):
         # the "thresh" keyword specifies the tolerance on the RMSD
         # see the documentation associated with this method for more details
         self.assertTrue(validate(mdl, ref_mdl, thresh="tight"))
+```
+
+<b>NOTE:</b> `TestWithSession` overwrites `unittest.TestCase`'s `setUp`, `tearDown`, `setUpClass`, and `tearDownClass` methods. The code it uses in these methods keeps track of how long each test took to run and puts some info together to print to the log when the test is done. If you want to implement your own methods for these, be sure to include `super` calls as appropriate to avoid errors. 
+
+To avoid having `TestWithSession` close all models between tests, set the `close_between_tests` or `close_between_classes` attributes to `False`:
+
+```python
+class MyTest(TestWithSession):
+    close_between_tests = False # do not close models during setUp/tearDown
+    close_between_classes = False # do not close models during setUpClass/tearDownClass
 ```
 
 To add this test, include a provider for the `test_manager` in your bundle_info.xml file. 

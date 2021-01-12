@@ -15,6 +15,8 @@ class TestWithSession(TestCase):
     session = None
     _prev_msg = ""
     _prev_test = ""
+    close_between_tests = True
+    close_between_classes = True
 
     @classmethod
     def addTests(cls, suite):
@@ -35,9 +37,18 @@ class TestWithSession(TestCase):
             found_tests.append(test_cls)
         
         return found_tests
-    
+
+    @classmethod
+    def setUpClass(cls):
+        if cls.close_between_classes:
+            from chimerax.core.commands import run
+            run(cls.session, "close")
+
     @classmethod
     def tearDownClass(cls):
+        if cls.close_between_classes:
+            from chimerax.core.commands import run
+            run(cls.session, "close")
         errors = len(cls.last_result.errors)
         fails = len(cls.last_result.failures)
         ok_msg = "{} ok"
@@ -75,8 +86,9 @@ class TestWithSession(TestCase):
         TestWithSession.last_result = None
 
     def setUp(self):
-        from chimerax.core.commands import run
-        run(TestWithSession.session, "close")
+        if self.close_between_tests:
+            from chimerax.core.commands import run
+            run(TestWithSession.session, "close")
         errors = len(self._outcome.result.errors)
         fails = len(self._outcome.result.failures)
         ok_msg = "{} ok"
@@ -109,8 +121,9 @@ class TestWithSession(TestCase):
         )
 
         TestWithSession.last_result = self._outcome.result
-        from chimerax.core.commands import run
-        run(TestWithSession.session, "close")
+        if self.close_between_tests:
+            from chimerax.core.commands import run
+            run(TestWithSession.session, "close")
 
 
 class _TESTMANAGER_API(BundleAPI):

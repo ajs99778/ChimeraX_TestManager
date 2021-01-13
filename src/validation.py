@@ -27,6 +27,69 @@ def check_atom_list(ref, comp):
     return rv
 
 
+def validate_elements(test, ref, debug=False):
+    """
+    Validates `test` atomic structure against `ref` atomic structure
+    Returns: True if validation passed, False if failed
+    
+    checks if elements match
+    """
+
+    # elements should all be the same
+    t_el = test.atoms.elements.names.tolist()
+    r_el = ref.atoms.elements.names.tolist()
+    if len(t_el) != len(r_el):
+        if debug:
+            print(
+                "wrong number of atoms: {} (test) vs. {} (ref)".format(
+                    len(t_el), len(r_el)
+                )
+            )
+        return False
+
+    for t, r in zip(t_el, r_el):
+        if t != r:
+            if debug:
+                print("elements don't match")
+            return False
+    
+    return True
+    
+
+def validate_connectivity(test, ref, debug=False):
+    """
+    Validates `test` atomic structure against `ref` atomic structure
+    Returns: True if validation passed, False if failed
+    
+    checks if bonding matches (does not check pseudo bonds)
+    """
+    import numpy as np
+
+    test_con = np.zeros((test.num_atoms, test.num_atoms), dtype=int)
+    ref_con = np.zeros((ref.num_atoms, ref.num_atoms), dtype=int)
+    for i, (test_atom, ref_atom) in enumerate(zip(test.atoms, ref.atoms)):
+        for test_neighbor in test_atom.neighbors:
+            j = test.atoms.index(test_neighbor)
+            test_con[i,j] = 1
+            test_con[j,i] = 1
+        for ref_neighbor in ref_atom.neighbors:
+            j = ref.atoms.index(ref_neighbor)
+            ref_con[i,j] = 1
+            ref_con[j,i] = 1
+    
+    if np.any(ref_con - test_con) != 0:
+        if debug:
+            con_diff = ref_con - test_con
+            print("connectivity differs")
+            for i in range(0, test.num_atoms):
+                for j in range(0, i):
+                    if con_diff[i,j] != 0:
+                        print("%s-%s" % (ref.atoms[i].atomspec, ref.atoms[j].atomspec))
+        return False
+    
+    return True
+
+
 def validate_atomic_structures(test, ref, thresh=None, debug=False):
     """
     Validates `test` atomic structure against `ref` atomic structure
@@ -64,47 +127,17 @@ def validate_atomic_structures(test, ref, thresh=None, debug=False):
         else:
             raise ValueError("Bad threshold provided")
 
-    # elements should all be the same
-    t_el = test.atoms.elements.names.tolist()
-    r_el = ref.atoms.elements.names.tolist()
-    if len(t_el) != len(r_el):
+    elements_valid = validate_elements(test, ref, debug=debug)
+    if not elements_valid:
         if debug:
-            print(
-                "wrong number of atoms: {} (test) vs. {} (ref)".format(
-                    len(t_el), len(r_el)
-                )
-            )
-        return False
+            print("bad elements")
+        return elements_valid
 
-    for t, r in zip(t_el, r_el):
-        if t != r:
-            if debug:
-                print("elements don't match")
-            return False
-    
-    # connectivity should match
-    # doesn't check pseudo bonds
-    test_con = np.zeros((test.num_atoms, test.num_atoms), dtype=int)
-    ref_con = np.zeros((ref.num_atoms, ref.num_atoms), dtype=int)
-    for i, (test_atom, ref_atom) in enumerate(zip(test.atoms, ref.atoms)):
-        for test_neighbor in test_atom.neighbors:
-            j = test.atoms.index(test_neighbor)
-            test_con[i,j] = 1
-            test_con[j,i] = 1
-        for ref_neighbor in ref_atom.neighbors:
-            j = ref.atoms.index(ref_neighbor)
-            ref_con[i,j] = 1
-            ref_con[j,i] = 1
-    
-    if np.any(ref_con - test_con) != 0:
+    connectivity_valid = validate_connectivity(test, ref, debug=debug)
+    if not connectivity_valid:
         if debug:
-            con_diff = ref_con - test_con
-            print("connectivity differs")
-            for i in range(0, test.num_atoms):
-                for j in range(0, i):
-                    if con_diff[i,j] != 0:
-                        print("%s-%s" % (ref.atoms[i].atomspec, ref.atoms[j].atomspec))
-        return False
+            print("bad connectivity")
+        return connectivity_valid
     
     # and RMSD should be below a threshold
     ref_coords = ref.active_coordset.xyzs

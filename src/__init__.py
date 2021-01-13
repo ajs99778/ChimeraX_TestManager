@@ -6,20 +6,29 @@ from chimerax.core.toolshed import BundleAPI
 
 
 class TestWithSession(TestCase):
+    """test case with a session attribute"""
     count = 0
+    "number of tests - set during the running of tests"
     total_time = 0
+    "time taken to run all tests - set during the running of tests"
     last_class = None
+    "class of the previous test - set during the running of tests"
     last_result = None
+    "previous result - set during the running of tests"
     _errors = 0
     _fails = 0
     session = None
+    "ChimeraX Session - set after TestManager bundle has initialized"
     _prev_msg = ""
     _prev_test = ""
     close_between_tests = True
+    "run the close command during setUp/tearDown"
     close_between_classes = True
+    "run the close command during setUpClass/tearDownClass"
 
     @classmethod
     def addTests(cls, suite):
+        """discover test methods of cls and add them to suite"""
         test_names = [
             key for key in cls.__dict__.keys() if key.startswith("test_")
         ]
@@ -40,12 +49,17 @@ class TestWithSession(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        """runs the close command if cls.close_between_classes"""
         if cls.close_between_classes:
             from chimerax.core.commands import run
             run(cls.session, "close")
 
     @classmethod
     def tearDownClass(cls):
+        """
+        runs the close command if cls.close_between_classes
+        also prints info from the tests that were run from this class
+        """
         if cls.close_between_classes:
             from chimerax.core.commands import run
             run(cls.session, "close")
@@ -86,6 +100,10 @@ class TestWithSession(TestCase):
         TestWithSession.last_result = None
 
     def setUp(self):
+        """
+        runs the close command if self.close_between_tests
+        also does some accounting for info to print to log about this test
+        """
         if self.close_between_tests:
             from chimerax.core.commands import run
             run(TestWithSession.session, "close")
@@ -105,6 +123,10 @@ class TestWithSession(TestCase):
         self.start_time = time.time()
 
     def tearDown(self):
+        """
+        runs the close command if self.close_between_tests
+        also does some accounting for info to print to log about this test
+        """
         t = time.time() - self.start_time
         TestWithSession.total_time += t
 
@@ -124,6 +146,31 @@ class TestWithSession(TestCase):
         if self.close_between_tests:
             from chimerax.core.commands import run
             run(TestWithSession.session, "close")
+
+    @classmethod
+    def open_tool(cls, name, tool_cls=None, log=True):
+        """
+        opens a tool with the specified name and returns the instance of that tool
+        returns False if the tool does not open
+        tool_cls: ToolInstance subclass corresponding to the name of the tool
+             this is used if the tool's name isn't the same as the specified name
+        log: log the command used to open the tool
+        """
+        from chimerax.core.commands import run
+        run(cls.session, "ui tool show \"%s\"" % name, log=log)
+        
+        opened_tool = False
+        for tool in cls.session.tools.list():
+            if tool_cls is not None:
+                if isinstance(tool, tool_cls):
+                    opened_tool = tool
+                    break
+            else:
+                if tool.tool_name == name:
+                    opened_tool = tool
+                    break
+        
+        return opened_tool
 
 
 class _TESTMANAGER_API(BundleAPI):

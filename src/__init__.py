@@ -202,16 +202,5 @@ class _TESTMANAGER_API(BundleAPI):
         if tool_info.name == "Run Tests":
             from .tools.test_tool import TestRunner
             return TestRunner(session, tool_info.name)
-    
-    @staticmethod
-    def run_provider(session, name, mgr, **kw):
-        if mgr == session.test_manager:
-            if name == "substitute_command":
-                from .tests.substitute_command import SubstituteCmdTest
-                return SubstituteCmdTest
-            
-            elif name == "normal_modes":
-                from .tests.normal_modes import NormalModesToolTest
-                return NormalModesToolTest
-    
+
 bundle_api = _TESTMANAGER_API()

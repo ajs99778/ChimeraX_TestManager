@@ -1,7 +1,7 @@
 try:
-    from PySide2.QtCore import QRegularExpression, Qt
-    from PySide2.QtGui import QFontDatabase
-    from PySide2.QtWidgets import (
+    from Qt.QtCore import QRegularExpression, Qt
+    from Qt.QtGui import QFontDatabase
+    from Qt.QtWidgets import (
         QVBoxLayout,
         QHBoxLayout,
         QTableWidget,

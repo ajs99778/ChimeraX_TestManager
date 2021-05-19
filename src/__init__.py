@@ -186,6 +186,9 @@ class _TESTMANAGER_API(BundleAPI):
         if command_info.name == "test":
             from .commands.test import register_test_command
             register_test_command(logger)
+        if command_info.name == "linter":
+            from .commands.linter import register_linter_command
+            register_linter_command(logger)
 
     @staticmethod
     def init_manager(session, bundle_info, name, **kwargs):
@@ -202,5 +205,8 @@ class _TESTMANAGER_API(BundleAPI):
         if tool_info.name == "Run Tests":
             from .tools.test_tool import TestRunner
             return TestRunner(session, tool_info.name)
+        if tool_info.name == "Linter":
+            from .tools.linter_tool import Linter
+            return Linter(session, tool_info.name)
 
 bundle_api = _TESTMANAGER_API()

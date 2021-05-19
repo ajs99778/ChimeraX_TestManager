@@ -3,6 +3,7 @@ try:
     from Qt.QtGui import QFontDatabase
     from Qt.QtWidgets import (
         QVBoxLayout,
+        QFormLayout,
         QHBoxLayout,
         QTableWidget,
         QTableWidgetItem,
@@ -12,12 +13,14 @@ try:
         QSizePolicy,
         QWidget,
         QTextBrowser,
+        QCheckBox,
     )
 except (ModuleNotFoundError, ImportError):
     from PyQt5.QtCore import QRegularExpression, Qt
     from PyQt5.QtGui import QFontDatabase
     from PyQt5.QtWidgets import (
         QVBoxLayout,
+        QFormLayout,
         QHBoxLayout,
         QTableWidget,
         QTableWidgetItem,
@@ -27,6 +30,7 @@ except (ModuleNotFoundError, ImportError):
         QSizePolicy,
         QWidget,
         QTextBrowser,
+        QCheckBox,
     )
 
 from chimerax.core.settings import Settings
@@ -65,7 +69,7 @@ class TestRunner(ToolInstance):
             * way to filter tests
             * button to run tests
         """
-        layout = QVBoxLayout()
+        layout = QFormLayout()
         
         # table to list test classes and the results
         self.table = QTableWidget()
@@ -76,21 +80,28 @@ class TestRunner(ToolInstance):
         self.table.horizontalHeader().setSectionResizeMode(1, self.table.horizontalHeader().Stretch)
         self.table.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         self.table.setSelectionBehavior(self.table.SelectRows)
-        layout.insertWidget(0, self.table, 1)
+        layout.addRow(self.table)
         
         self.filter = QLineEdit()
         self.filter.setPlaceholderText("filter test names")
         self.filter.setClearButtonEnabled(True)
         self.filter.textChanged.connect(self.apply_filter)
-        layout.insertWidget(1, self.filter, 0)
+        layout.addRow(self.filter)
         
+        self.profile = QCheckBox()
+        self.profile.setToolTip(
+            "profile functions called during testing "
+            "using cProfile"
+        )
+        layout.addRow("profile calls:", self.profile)
+
         self.run_button = QPushButton("run tests")
         self.run_button.clicked.connect(self.run_tests)
         self.run_button.setToolTip(
             "if no tests are selected on the table, run all tests\n" +
             "otherwise, run selected tests"
         )
-        layout.insertWidget(2, self.run_button)
+        layout.addRow(self.run_button)
         
         self.fill_table()
         self.table.resizeColumnToContents(0)
@@ -158,8 +169,12 @@ class TestRunner(ToolInstance):
             if not test_list:
                 test_list = ["all"]
         
-        results = test(self.session, test_list)
-        
+        results, stats = test(
+            self.session,
+            test_list,
+            profile=self.profile.checkState() == Qt.Checked
+        )
+
         cell_widgets = []
         
         for name in results:
@@ -319,6 +334,11 @@ class TestRunner(ToolInstance):
                 self.table.setCellWidget(i, 1, cell_widgets[widget_count])
                 # self.table.resizeRowToContents(i)
                 widget_count += 1
+
+        if self.profile.checkState() == Qt.Checked:
+            self.tool_window.create_child_window(
+                "stats", text=stats, window_class=ResultsWindow
+            )
 
 
 class ResultsWindow(ChildToolWindow):

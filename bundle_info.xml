@@ -4,7 +4,7 @@
             maxSessionVersion="3"
             package="TestManager"
             purePython="true"
-            version="0.2.1">
+            version="0.3">
             
             <Author>Tony Schaefer</Author>
             <Email>tony.schaefer@uga.edu</Email>
@@ -92,6 +92,10 @@ For both the `test` command the the tool, results are printed to the log.
 
             <Dependencies>
                 <Dependency name="ChimeraX-Core" version=">=1.1"/>
+                <Dependency name="flake8"/>
+                <Dependency name="pyflakes"/>
+                <Dependency name="mypy"/>
+                <Dependency name="pydocstyle"/>
             </Dependencies>
             
             <Classifiers>
@@ -102,8 +106,10 @@ For both the `test` command the the tool, results are printed to the log.
                 <PythonClassifier>Programming Language :: Python :: 3</PythonClassifier>
 
                 <ChimeraXClassifier>ChimeraX :: Tool :: Run Tests :: Utilities :: run tests</ChimeraXClassifier>
+                <ChimeraXClassifier>ChimeraX :: Tool :: Linter :: Utilities :: check for errors in code</ChimeraXClassifier>
 
                 <ChimeraXClassifier>ChimeraX :: Command :: test :: Utilities :: run a test</ChimeraXClassifier>
+                <ChimeraXClassifier>ChimeraX :: Command :: linter :: Utilities :: run a code linter</ChimeraXClassifier>
             </Classifiers>
 
 </BundleInfo>
